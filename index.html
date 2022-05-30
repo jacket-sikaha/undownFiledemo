@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>上传</h1>
+    <form action="up" method="post" enctype="multipart/form-data">
+       
+            <input type="file" id="a" name="test" multiple>
+       
+            <input type="submit" value="提交">
+            <input type="button" value="ajax提交" class="axio">
+        </form>
+        <hr>
+        <div >
+            <h1>下载列表</h1>
+            <ul class="down">
+                <li><a href="/t">test</a></li>
+            </ul>
+
+        </div>
+        
+</body>
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.27.2/axios.js"></script>
+<script>
+    let input = document.querySelector('#a')
+    let down = document.querySelector('.down')
+    input.addEventListener('change',(e)=>{
+        // console.dir(e.target.files[0]);
+    })
+
+    function upFile(file) {
+        let formData = new FormData();
+        
+        // console.dir(file.files);
+        let fileList = [...file.files].forEach((value,index)=>{
+            console.log(value);
+            formData.append(`test`,value,value.name)
+        })
+        console.log(formData);
+
+        axios({
+            url: "/up",
+            method: "post",
+            headers: { "Content-Type": "multipart/form-data" },
+            data: formData ,
+        }).then(
+            res =>{
+                console.log(res)
+                let {data} = res
+                for(let i = 0;i < data.length;i++){
+                    let newDoc = document.createElement('a')
+                    let newLi = document.createElement('li')
+                    newDoc.href = `/down?filename=${data[i].filename}`
+                    newDoc.textContent = data[i].originalname
+                    newLi.appendChild(newDoc)
+                    down.appendChild(newLi)
+                }
+            }
+        )
+}
+    document.querySelector('.axio').addEventListener('click',()=>{
+        upFile(input)
+    }) 
+</script>
+</html>
